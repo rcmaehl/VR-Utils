@@ -15,36 +15,26 @@ EndFunc
 
 Func _ProcessSuspend($sProcess)
 	$iPID = ProcessExists($sProcess)
-	If $iPID Then
-		$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
-		$i_success = DllCall("ntdll.dll","int","NtSuspendProcess","int",$ai_Handle[0])
-		DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
-		If IsArray($i_success) Then
-			Return 1
-		Else
-			SetError(1)
-			Return 0
-		Endif
+	$hProcess = _WinAPI_OpenProcess($PROCESS_SUSPEND_RESUME, False, $iPID)
+	$iSuccess = DllCall("ntdll.dll", "int", "NtSuspendProcess", "int", $hProcess)
+	_WinAPI_CloseHandle($hProcess)
+	If IsArray($iSuccess) Then
+		Return 1
 	Else
-		SetError(2)
+		SetError(1)
 		Return 0
 	EndIf
 EndFunc
 
 Func _ProcessResume($sProcess)
 	$iPID = ProcessExists($sProcess)
-	If $iPID Then
-		$ai_Handle = DllCall("kernel32.dll", 'int', 'OpenProcess', 'int', 0x1f0fff, 'int', False, 'int', $iPID)
-		$i_success = DllCall("ntdll.dll","int","NtResumeProcess","int",$ai_Handle[0])
-		DllCall('kernel32.dll', 'ptr', 'CloseHandle', 'ptr', $ai_Handle)
-		If IsArray($i_success) Then
-			Return 1
-		Else
-			SetError(1)
-			Return 0
-		Endif
+	$hProcess = _WinAPI_OpenProcess($PROCESS_SUSPEND_RESUME, False, $iPID)
+	$iSuccess = DllCall("ntdll.dll", "int", "NtResumeProcess", "int", $hProcess)
+	_WinAPI_CloseHandle($hProcess)
+	If IsArray($iSuccess) Then
+		Return 1
 	Else
-		SetError(2)
+		SetError(1)
 		Return 0
 	EndIf
 EndFunc
